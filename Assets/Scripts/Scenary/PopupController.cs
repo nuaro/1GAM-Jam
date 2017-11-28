@@ -24,7 +24,7 @@ public abstract class PopupController : SplashScreenController
         return false;
     }
 
-    // Override the "alpha" 
+    // Override the "alpha" to add animation scale
     protected override void SetAlpha( float alpha )
     {
         base.SetAlpha( alpha );

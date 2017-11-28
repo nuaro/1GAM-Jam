@@ -14,3 +14,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainScene.unity
     guid: 10742554fa4f64cddbcc3ea3ba9b8e30
+  - enabled: 1
+    path: Assets/Popups/PopUpExample.unity
+    guid: b3fa3686ffb024581b5ab2b243c9849b
