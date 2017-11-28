@@ -72,217 +72,235 @@ public class SceneRepository
 
 
 
-// SceneRepository Implementation ========================================================
-public class SceneRepositoryImp : MonoBehaviour
-{
-    // SharedObject ----------------------------------------------------------------------
-    private static SceneRepositoryImp _sharedObject;
-    
-    public static SceneRepositoryImp SharedObject
-    {
-        get
-        {
-            if( _sharedObject == null )
-            {
-                GameObject gameObject = new GameObject( "SceneRepository" );
-                GameObject.DontDestroyOnLoad( gameObject );
-                
-                _sharedObject = gameObject.AddComponent<SceneRepositoryImp>();
-            }
-            
-            return _sharedObject;
-        }
-    }
-    
-    
-    // Scene Registry --------------------------------------------------------------------
-    class SceneInfo
-    {
-        public readonly string name;
-        public SceneController controller;
-        public bool loading;
-        
-        public SceneInfo( string _name )
-        {
-            name = _name;
-            controller = null;
-            loading = false;
-        }
-    }
-    
-    private Dictionary<System.Type,SceneInfo> scenes = new Dictionary<System.Type,SceneInfo>();
-    
-    public void RegisterScene( System.Type controllerType )
-    {
-        if( !scenes.ContainsKey( controllerType ) )
-        {
-            string name = SceneController.GetSceneFileName( controllerType );
-            scenes.Add( controllerType, new SceneInfo( name ) );
-        }
-    }
+	// SceneRepository Implementation ========================================================
+	public class SceneRepositoryImp : MonoBehaviour
+	{
+	    // SharedObject ----------------------------------------------------------------------
+	    private static SceneRepositoryImp _sharedObject;
+	    
+	    public static SceneRepositoryImp SharedObject
+	    {
+	        get
+	        {
+	            if( _sharedObject == null )
+	            {
+	                GameObject gameObject = new GameObject( "SceneRepository" );
+	                GameObject.DontDestroyOnLoad( gameObject );
+	                
+	                _sharedObject = gameObject.AddComponent<SceneRepositoryImp>();
+	            }
+	            
+	            return _sharedObject;
+	        }
+	    }
+	    
+	    
+	    // Scene Registry --------------------------------------------------------------------
+	    class SceneInfo
+	    {
+	        public readonly string name;
+	        public SceneController controller;
+	        public bool loading;
+	        
+	        public SceneInfo( string _name )
+	        {
+	            name = _name;
+	            controller = null;
+	            loading = false;
+	        }
+	    }
+	    
+	    private Dictionary<System.Type,SceneInfo> scenes = new Dictionary<System.Type,SceneInfo>();
+	    
+	    public void RegisterScene( System.Type controllerType )
+	    {
+	        if( !scenes.ContainsKey( controllerType ) )
+	        {
+	            string name = SceneController.GetSceneFileName( controllerType );
+	            scenes.Add( controllerType, new SceneInfo( name ) );
+	        }
+	    }
 
-    public void SetSceneControllerReference( SceneController controller )
-    {
-        RegisterScene( controller.GetType() );
-    
-        SceneInfo sceneInfo;
-        
-        if( scenes.TryGetValue( controller.GetType(), out sceneInfo ) )
-        {
-            if( (sceneInfo.controller != null) && (sceneInfo.controller != controller) )
-                Debug.LogError( string.Format( "SceneRepository: Trying to register multiple instances of {0}", controller.GetType().Name ) );
-        
-            sceneInfo.controller = controller;
-        }
-    }
-    
-    public ICollection<System.Type> GetRegisteredSceneTypes()
-    {
-        return scenes.Keys;
-    }
-    
-    
-    // Scene Lookup ----------------------------------------------------------------------
-    public SceneController GetScene( System.Type sceneControllerType )
-    {
-        SceneInfo sceneInfo;
-        
-        if( scenes.TryGetValue( sceneControllerType, out sceneInfo ) )
-            return sceneInfo.controller;
-        
-        return null;
-    }
+		
+		public void UnRegisterScene( System.Type controllerType )
+		{
+			if (scenes.ContainsKey (controllerType)) 
+			{
+				scenes.Remove (controllerType);
+			}
+		}
 
-    public List<SceneController> GetScenes( SceneRepository.Predicate predicate )
-    {
-        List<SceneController> list = new List<SceneController>();
-        
-        foreach( KeyValuePair<System.Type,SceneInfo> entry in scenes )
-        {
-            if( entry.Value.controller )
-            {
-                if( predicate( entry.Value.controller ) )
-                    list.Add( entry.Value.controller );
-            }
-        }
-        
-        return list;
-    }
+	    public void SetSceneControllerReference( SceneController controller )
+	    {
+	        RegisterScene( controller.GetType() );
+	    
+	        SceneInfo sceneInfo;
+	        
+	        if( scenes.TryGetValue( controller.GetType(), out sceneInfo ) )
+	        {
+	            if( (sceneInfo.controller != null) && (sceneInfo.controller != controller) )
+	                Debug.LogError( string.Format( "SceneRepository: Trying to register multiple instances of {0}", controller.GetType().Name ) );
+	        
+	            sceneInfo.controller = controller;
+	        }
+	    }
+	    
+	    public ICollection<System.Type> GetRegisteredSceneTypes()
+	    {
+	        return scenes.Keys;
+	    }
+	    
+	    
+	    // Scene Lookup ----------------------------------------------------------------------
+	    public SceneController GetScene( System.Type sceneControllerType )
+	    {
+	        SceneInfo sceneInfo;
+	        
+	        if( scenes.TryGetValue( sceneControllerType, out sceneInfo ) )
+	            return sceneInfo.controller;
+	        
+	        return null;
+	    }
 
-    
-    // Scene Lookup+Loading --------------------------------------------------------------
-    public void LoadScene( System.Type sceneControllerType, bool additive, bool async, System.Action<SceneController> callback )
-    {
-        RegisterScene( sceneControllerType );
+	    public List<SceneController> GetScenes( SceneRepository.Predicate predicate )
+	    {
+	        List<SceneController> list = new List<SceneController>();
+	        
+	        foreach( KeyValuePair<System.Type,SceneInfo> entry in scenes )
+	        {
+	            if( entry.Value.controller )
+	            {
+	                if( predicate( entry.Value.controller ) )
+	                    list.Add( entry.Value.controller );
+	            }
+	        }
+	        
+	        return list;
+	    }
 
-        SceneInfo sceneInfo;
-        
-        if( scenes.TryGetValue( sceneControllerType, out sceneInfo ) )
-        {
-            if( !sceneInfo.controller )
-            {
-                StartCoroutine( LoadScene( sceneInfo, additive, async, callback ) );
-            }
+	    
+	    // Scene Lookup+Loading --------------------------------------------------------------
+	    public void LoadScene( System.Type sceneControllerType, bool additive, bool async, System.Action<SceneController> callback )
+	    {
+	        RegisterScene( sceneControllerType );
 
-            else
-            {
-                if( callback != null )
-                    callback( sceneInfo.controller );
-            }
-        }
+	        SceneInfo sceneInfo;
+	        
+	        if( scenes.TryGetValue( sceneControllerType, out sceneInfo ) )
+	        {
+	            if( !sceneInfo.controller )
+	            {
+	                StartCoroutine( LoadScene( sceneInfo, additive, async, callback ) );
+	            }
 
-        else
-        {
-            if( callback != null )
-                callback( sceneInfo.controller );
-        }
-    }
+	            else
+	            {
+	                if( callback != null )
+	                    callback( sceneInfo.controller );
+	            }
+	        }
 
-    private IEnumerator LoadScene( SceneInfo sceneInfo, bool additive, bool async, System.Action<SceneController> callback )
-    {
-        // Already loading?
-        while( sceneInfo.loading )
-            yield return null;
-            
-        if( !sceneInfo.controller )
-        {
-            sceneInfo.loading = true;
-            
-            if( additive )
-            {
-                if( async )
-                {
-					yield return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneInfo.name, UnityEngine.SceneManagement.LoadSceneMode.Additive);
-                }
-        
-                else
-                {
-                    // Note: LoadLevelAdditive does not fully complete until next frame
-					UnityEngine.SceneManagement.SceneManager.LoadScene(sceneInfo.name, UnityEngine.SceneManagement.LoadSceneMode.Additive);
-                    yield return null;
-                }
-            }
-        
-            else
-            {
-                if( async )
-                {
-					yield return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync( sceneInfo.name );
-                }
-        
-                else
-                {
-                    // Note: LoadLevel does not fully complete until next frame
-					UnityEngine.SceneManagement.SceneManager.LoadScene(sceneInfo.name);
-                    yield return null;
-                }
-            }
+	        else
+	        {
+	            if( callback != null )
+	                callback( sceneInfo.controller );
+	        }
+	    }
 
-            sceneInfo.loading = false;
-        }
+	    private IEnumerator LoadScene( SceneInfo sceneInfo, bool additive, bool async, System.Action<SceneController> callback )
+	    {
+	        // Already loading?
+	        while( sceneInfo.loading )
+	            yield return null;
+	            
+	        if( !sceneInfo.controller )
+	        {
+	            sceneInfo.loading = true;
+	            
+	            if( additive )
+	            {
+	                if( async )
+	                {
+						yield return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneInfo.name, UnityEngine.SceneManagement.LoadSceneMode.Additive);
+	                }
+	        
+	                else
+	                {
+	                    // Note: LoadLevelAdditive does not fully complete until next frame
+						UnityEngine.SceneManagement.SceneManager.LoadScene(sceneInfo.name, UnityEngine.SceneManagement.LoadSceneMode.Additive);
+	                    yield return null;
+	                }
+	            }
+	        
+	            else
+	            {
+	                if( async )
+	                {
+						yield return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync( sceneInfo.name );
+	                }
+	        
+	                else
+	                {
+	                    // Note: LoadLevel does not fully complete until next frame
+						UnityEngine.SceneManagement.SceneManager.LoadScene(sceneInfo.name);
+	                    yield return null;
+	                }
+	            }
 
-        if( callback != null )
-            callback( sceneInfo.controller );
-    }
+	            sceneInfo.loading = false;
+	        }
 
-    public void UnloadScene( System.Type sceneControllerType )
-    {
-        SceneInfo sceneInfo;
-        
-        if( scenes.TryGetValue( sceneControllerType, out sceneInfo ) )
-        {
-            if( sceneInfo.controller )
-            {
-                if( !sceneInfo.controller.ShouldUnload() )
-                {
-                    Debug.LogWarning( string.Format( "Unloading Scene {0}",
-                        SceneController.GetSceneFileName( sceneControllerType ) ) );
-                }
-            
-                GameObject.Destroy( sceneInfo.controller.gameObject );
-                sceneInfo.controller = null;
-            }
-        }
-    }
+	        if( callback != null )
+	            callback( sceneInfo.controller );
+	    }
 
-    public void UnloadScenes( SceneRepository.Predicate predicate )
-    {
-        foreach( KeyValuePair<System.Type,SceneInfo> entry in scenes )
-        {
-            if( entry.Value.controller )
-            {
-                if( entry.Value.controller.ShouldUnload() )
-                {
-                    if( predicate( entry.Value.controller ) )
-                    {
-                        GameObject.Destroy( entry.Value.controller.gameObject );
-                        entry.Value.controller = null;
-                    }
-                }
-            }
-        }
-    }
-}
+	    public void UnloadScene( System.Type sceneControllerType )
+	    {
+	        SceneInfo sceneInfo;
+	        
+	        if( scenes.TryGetValue( sceneControllerType, out sceneInfo ) )
+	        {
+	            if( sceneInfo.controller )
+	            {
+	                if( !sceneInfo.controller.ShouldUnload() )
+	                {
+	                    Debug.LogWarning( string.Format( "Unloading Scene {0}",
+	                        SceneController.GetSceneFileName( sceneControllerType ) ) );
+	                }
+	            
+	                GameObject.Destroy( sceneInfo.controller.gameObject );
+					UnityEngine.SceneManagement.SceneManager.UnloadScene (sceneInfo.name);
+	                //.sceneInfo.controller = null;
+					UnRegisterScene(sceneControllerType);
+	            }
+	        }
+	    }
+
+	    public void UnloadScenes( SceneRepository.Predicate predicate )
+	    {
+			List<System.Type> scenesToUnregister = new List<System.Type> ();
+	        foreach( KeyValuePair<System.Type,SceneInfo> entry in scenes )
+	        {
+	            if( entry.Value.controller )
+	            {
+	                if( entry.Value.controller.ShouldUnload() )
+	                {
+	                    if( predicate( entry.Value.controller ) )
+	                    {
+	                        GameObject.Destroy( entry.Value.controller.gameObject );
+							UnityEngine.SceneManagement.SceneManager.UnloadScene (entry.Value.name);
+							scenesToUnregister.Add(entry.Key);
+	                    }
+	                }
+	            }
+	        }
+
+			//now unregister scenes
+			foreach (System.Type item in scenesToUnregister) {
+				UnRegisterScene(item);
+			}
+	    }
+	}
 
 
 } // namespace FUEL.RPR.Presentation

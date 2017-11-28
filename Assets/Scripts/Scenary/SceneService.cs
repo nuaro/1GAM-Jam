@@ -6,39 +6,10 @@ namespace Base.Scenery
 {
 	public static class SceneService
 	{
-		public static void LoadScene<T>( bool aditive = true, System.Action<T> callback  = null)
-			where T : SceneController
-		{
-			// Disable interaction on everything so EventSystem doesn't whine
-			foreach( SceneController controller in SceneRepository.GetAllScenes() ){
-				controller.SetInteractable( false );
-				controller.SetVisible( false );
-			}
 
-			// Load the new scene
-			SceneRepository.LoadScene<T>( aditive, true, delegate( T loadedSceneController )
-				{
-					// Unload everything but the scene we just loaded
-					SceneRepository.UnloadScenes( delegate( SceneController controller )
-						{
-							return (controller != loadedSceneController);
-						});
-
-					// Cleanup assets
-					Resources.UnloadUnusedAssets();
-
-					// Enable interaction for the loaded scene
-					loadedSceneController.SetInteractable( true );
-					loadedSceneController.SetVisible( true );
-
-					// Notify the caller
-					if( callback != null )
-						callback( loadedSceneController );
-				});
-		}
-
-		public static void LoadScene<T,LoadingScreen>( bool aditive = true, System.Action<T> callback = null )
-			where T : SceneController
+		public static void LoadScene<From,To,LoadingScreen>( bool aditive = true, System.Action<To> callback = null )
+			where From : SceneController
+			where To : SceneController
 			where LoadingScreen : SceneController
 		{
 			// Disable interaction on everything
@@ -48,17 +19,15 @@ namespace Base.Scenery
 			// Show the loading screen (and load it on-the-fly if necessary)
 			SceneRepository.LoadScene<LoadingScreen>( true, false, delegate( LoadingScreen loadingScreen )
 				{
-					GameObject.DontDestroyOnLoad(loadingScreen.gameObject);	
+					//GameObject.DontDestroyOnLoad(loadingScreen.gameObject);	
 					loadingScreen.SetVisible( true, true, delegate()
 						{
-							// Unload everything but the loading screen
-							SceneRepository.UnloadScenes( delegate( SceneController controller )
-								{
-									return (controller != loadingScreen);
-								});
-
+							//unload from scene only if is not aditive
+							if(!aditive){
+								SceneRepository.UnloadScene<From>();
+							}
 							// Load the new scene
-							SceneRepository.LoadScene<T>( aditive, true, delegate( T loadedSceneController )
+							SceneRepository.LoadScene<To>( true, true, delegate( To loadedSceneController )
 								{
 									// Cleanup assets
 									Resources.UnloadUnusedAssets();
@@ -69,7 +38,11 @@ namespace Base.Scenery
 											// Enable interaction for the loaded scene
 											loadedSceneController.SetInteractable( true );
 
+											//we only remove the loading scene if is additive, is removed automatically
 											SceneRepository.UnloadScene<LoadingScreen>();
+											if(!aditive){
+												SceneRepository.UnloadScene<From>();
+											}
 
 											// Notify the caller
 											if( callback != null )
