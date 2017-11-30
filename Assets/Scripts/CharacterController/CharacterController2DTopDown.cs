@@ -184,7 +184,6 @@ public class CharacterController2DTopDown : MonoBehaviour {
 	public void move( Vector3 deltaMovement )
 	{
 		
-		Debug.Log ("-------------------controller2d  deltaMovement x : " + deltaMovement.x + " y: " + deltaMovement.y);
 		// clear our state
 		collisionState.reset();
 		_raycastHitsThisFrame.Clear();
