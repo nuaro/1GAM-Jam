@@ -8,10 +8,12 @@ public class DemoController : MonoBehaviour {
 
 	private CharacterController2DTopDown _controller;
 	private Vector3 _velocity;
+	private Animator _animator;
 	// Use this for initialization
 	void Awake()
 	{
 		_controller = GetComponent<CharacterController2DTopDown>();
+		_animator = GetComponent<Animator>();
 
 		// listen to some events for illustration purposes
 		_controller.onControllerCollidedEvent += onControllerCollider;
@@ -53,6 +55,17 @@ public class DemoController : MonoBehaviour {
 		_velocity.x = horizontalInput * runSpeed;
 		_velocity.y = verticalInput * runSpeed;
 
+		Vector3 scale = this.transform.localScale;
+		if(_velocity.x != 0){
+			if (Mathf.Sign(_velocity.x) != Mathf.Sign(scale.x))
+			{
+				this.transform.localScale = new Vector3(-scale.x, scale.y, scale.z);
+			}
+		}
+
+
+		_animator.SetFloat ("speed_x", Mathf.Abs (_velocity.x));
+		_animator.SetFloat ("speed_y", _velocity.y);
 
 		this._controller.move (this._velocity * Time.deltaTime);
 	}
