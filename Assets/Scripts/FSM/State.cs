@@ -3,11 +3,11 @@
 public abstract class State<T>   where T : class {
 
 
-	public abstract void Enter(T Miner);
+	public abstract void Enter(T Owner);
 
-	public abstract void Execute(T Miner);
+	public abstract void Execute(T Owner);
 
-	public abstract void Exit(T Miner);
+	public abstract void Exit(T Owner);
 
 	
 }

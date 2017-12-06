@@ -9,11 +9,29 @@ public class Map03SceneController :SceneController {
 
 	public TriggerHelper exitDoor;
 
+	private bool enableTriggers = false;
 
+	public static Vector3 playerSpawnPosition {
+		get {
+			Vector3 spawnPosition =  new Vector3 (-341.0f, 151.0f, 0.0f);
+
+			Vector3 playerPosition = DemoController.GetPlayerPosition ();
+
+			if (!playerPosition.Equals (Vector3.negativeInfinity)) {
+
+				spawnPosition.y = playerPosition.y;
+
+			}
+
+			return spawnPosition;
+		}
+	}
 
 	#region ===================================== MonoBehaviour ====================================
 	protected override void Awake() {
 		base.Awake ();
+
+		enableTriggers = true;
 
 		if (exitDoor != null) {
 			exitDoor.onTriggerEnterEvent += OnExitDoorTriggerEnter;
@@ -27,9 +45,16 @@ public class Map03SceneController :SceneController {
 
 	#region delegates
 	void OnExitDoorTriggerEnter (Collider2D col){
+		if (enableTriggers) {
+			Debug.Log ("OnExitDoorTriggerEnter: " + col.gameObject.name);
+			DemoController.EnableInput (false);
+			DemoController.SetPositionPlayer (Map01SceneController.playerSpawnPositionCommingFromLeft);
+			SceneService.MoveToSceneFrom<Map03SceneController,Map01SceneController> (false, direction_to_move.right,delegate(Map01SceneController obj) {
+				DemoController.EnableInput(true);
+			});
 
-		Debug.Log( "OnExitDoorTriggerEnter: " + col.gameObject.name );
-		//SceneRepository.LoadScene<GameSceneController> (false, true, null);
+			enableTriggers = false;
+		}
 	}
 
 	void OnExitDoorTriggerStay (Collider2D col){

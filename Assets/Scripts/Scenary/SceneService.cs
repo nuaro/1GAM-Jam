@@ -52,5 +52,44 @@ namespace Base.Scenery
 						});
 				});
 		}
+
+		//this add camera movement on transition
+		public static void MoveToSceneFrom<From,To>(bool aditive = true, direction_to_move move_to = direction_to_move.right, System.Action<To> callback = null )
+			where From : SceneController
+			where To : SceneController
+		{
+			// Disable interaction on everything
+			foreach( SceneController controller in SceneRepository.GetAllScenes() )
+				controller.SetInteractable( false );
+
+
+
+			SceneRepository.LoadScene<To> (true, true, delegate( To loadedSceneController) {
+				// Cleanup assets
+				Resources.UnloadUnusedAssets ();
+				CameraAlign camAlign = Camera.main.gameObject.GetComponent<CameraAlign>();
+
+				if(camAlign != null){
+					camAlign.SetNewPosition(move_to, delegate(){
+
+						if(!aditive){
+							SceneRepository.UnloadScene<From>();
+						}
+
+						if( callback != null )
+							callback( loadedSceneController );
+
+					});
+				}
+				else {
+
+					Debug.Log("----------Errorrrrrrr cam is null");
+				}
+
+
+
+			});
+
+		}
 	}
-} // namespace FUEL.SceneManagement.Application
+} 

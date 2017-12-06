@@ -9,6 +9,22 @@ public class Map02SceneController :  SceneController {
 
 	public TriggerHelper exitDoor;
 
+	public static Vector3 playerSpawnPosition {
+		get {
+			Vector3 spawnPosition =  new Vector3 (160.0f, 197.0f, 0.0f);
+
+			Vector3 playerPosition = DemoController.GetPlayerPosition ();
+
+			if (!playerPosition.Equals (Vector3.negativeInfinity)) {
+
+				spawnPosition.x = playerPosition.x;
+
+			}
+
+			return spawnPosition;
+		}
+	}
+
 
 
 	#region ===================================== MonoBehaviour ====================================
@@ -20,6 +36,7 @@ public class Map02SceneController :  SceneController {
 			exitDoor.onTriggerStayEvent += OnExitDoorTriggerStay;
 			exitDoor.onTriggerExitEvent += OnExitDoorTriggerExit;
 		}
+			
 
 	}
 
@@ -29,7 +46,11 @@ public class Map02SceneController :  SceneController {
 	void OnExitDoorTriggerEnter (Collider2D col){
 		
 		Debug.Log( "OnExitDoorTriggerEnter: " + col.gameObject.name );
-		SceneService.LoadScene<Map02SceneController,GameSceneController,TransitionSceneController>(false, null);
+		DemoController.SetPlayerVisible (false);
+		DemoController.SetPositionPlayer (Map01SceneController.playerSpawnPosition);
+		SceneService.LoadScene<Map02SceneController,Map01SceneController,TransitionSceneController>(false, delegate(Map01SceneController obj) {
+			DemoController.SetPlayerVisible (true);
+		});
 	}
 
 	void OnExitDoorTriggerStay (Collider2D col){

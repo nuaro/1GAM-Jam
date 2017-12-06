@@ -269,7 +269,7 @@ public class SceneRepository
 	                }
 	            
 	                GameObject.Destroy( sceneInfo.controller.gameObject );
-					UnityEngine.SceneManagement.SceneManager.UnloadScene (sceneInfo.name);
+					UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync (sceneInfo.name);
 	                //.sceneInfo.controller = null;
 					UnRegisterScene(sceneControllerType);
 	            }
@@ -288,7 +288,7 @@ public class SceneRepository
 	                    if( predicate( entry.Value.controller ) )
 	                    {
 	                        GameObject.Destroy( entry.Value.controller.gameObject );
-							UnityEngine.SceneManagement.SceneManager.UnloadScene (entry.Value.name);
+							UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync (entry.Value.name);
 							scenesToUnregister.Add(entry.Key);
 	                    }
 	                }

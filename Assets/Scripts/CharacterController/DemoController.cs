@@ -10,8 +10,17 @@ public class DemoController : MonoBehaviour {
 	private Vector3 _velocity;
 	private Animator _animator;
 	// Use this for initialization
+
+	private bool enableInput = true;
+
+	//instance simple
+	public static DemoController playerInstance = null;
+
 	void Awake()
 	{
+
+		playerInstance = this;
+
 		_controller = GetComponent<CharacterController2DTopDown>();
 		_animator = GetComponent<Animator>();
 
@@ -49,24 +58,64 @@ public class DemoController : MonoBehaviour {
 
 	void Update()
 	{
-		float horizontalInput = Input.GetAxisRaw("Horizontal"); 
-		float verticalInput = Input.GetAxisRaw("Vertical");
+		if (enableInput) {
+			float horizontalInput = Input.GetAxisRaw ("Horizontal"); 
+			float verticalInput = Input.GetAxisRaw ("Vertical");
 
-		_velocity.x = horizontalInput * runSpeed;
-		_velocity.y = verticalInput * runSpeed;
+			_velocity.x = horizontalInput * runSpeed;
+			_velocity.y = verticalInput * runSpeed;
 
-		Vector3 scale = this.transform.localScale;
-		if(_velocity.x != 0){
-			if (Mathf.Sign(_velocity.x) != Mathf.Sign(scale.x))
-			{
-				this.transform.localScale = new Vector3(-scale.x, scale.y, scale.z);
+			Vector3 scale = this.transform.localScale;
+			if (_velocity.x != 0) {
+				if (Mathf.Sign (_velocity.x) != Mathf.Sign (scale.x)) {
+					this.transform.localScale = new Vector3 (-scale.x, scale.y, scale.z);
+				}
 			}
+
+
+			_animator.SetFloat ("speed_x", Mathf.Abs (_velocity.x));
+			_animator.SetFloat ("speed_y", _velocity.y);
+
+			this._controller.move (this._velocity * Time.deltaTime);
+		}
+	}
+
+	void OnDestroy() {
+
+		playerInstance = null;
+
+	}
+
+	public static void SetPositionPlayer(Vector3 position){
+
+		if (playerInstance != null) {
+			
+			playerInstance.transform.localPosition = position;
+
+		}
+	}
+
+	public static void SetPlayerVisible(bool show){
+
+		if (playerInstance != null) {
+
+			playerInstance.gameObject.SetActive(show);
+
+		}
+	}
+
+	public static Vector3 GetPlayerPosition() {
+		if (playerInstance != null) {
+
+			return playerInstance.transform.localPosition;
 		}
 
+		return Vector3.negativeInfinity;
+	}
 
-		_animator.SetFloat ("speed_x", Mathf.Abs (_velocity.x));
-		_animator.SetFloat ("speed_y", _velocity.y);
-
-		this._controller.move (this._velocity * Time.deltaTime);
+	public static void EnableInput (bool enable){
+		if (playerInstance != null) {
+			playerInstance.enableInput = enable;
+		}
 	}
 }

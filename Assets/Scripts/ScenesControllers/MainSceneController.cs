@@ -26,6 +26,7 @@ public class MainSceneController : SceneController {
 
 	public void StartGame(){
 		SceneService.LoadScene<MainSceneController,GameSceneController,TransitionSceneController>(false, null);
+
 	}
 
 }
