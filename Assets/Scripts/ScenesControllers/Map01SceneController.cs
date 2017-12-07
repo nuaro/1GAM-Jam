@@ -14,15 +14,17 @@ public class Map01SceneController : SceneController {
 
 	private bool enableTriggers = false;
 
+	private PlayerController player = null;
+
 	public static Vector3 playerSpawnPosition {
 		get {
 			Vector3 spawnPosition =  new Vector3 (2.0f, -12.0f, 0.0f);
 
-			Vector3 playerPosition = DemoController.GetPlayerPosition ();
+			PlayerController _player = GameSceneController.GetMainPlayer ();
 
-			if (!playerPosition.Equals (Vector3.negativeInfinity)) {
+			if (_player != null) {
 
-				spawnPosition.x = playerPosition.x;
+				spawnPosition.x = _player.GetPlayerPosition().x;
 
 			}
 
@@ -34,11 +36,11 @@ public class Map01SceneController : SceneController {
 		get {
 			Vector3 spawnPosition =  new Vector3 (-296.0f, 152.0f, 0.0f);
 
-			Vector3 playerPosition = DemoController.GetPlayerPosition ();
+			PlayerController _player = GameSceneController.GetMainPlayer ();
 
-			if (!playerPosition.Equals (Vector3.negativeInfinity)) {
+			if (_player != null) {
 
-				spawnPosition.y = playerPosition.y;
+				spawnPosition.y = _player.GetPlayerPosition().y;
 
 			}
 
@@ -50,11 +52,11 @@ public class Map01SceneController : SceneController {
 		get {
 			Vector3 spawnPosition =  new Vector3 (298.0f, 122.0f, 0.0f);
 
-			Vector3 playerPosition = DemoController.GetPlayerPosition ();
+			PlayerController _player = GameSceneController.GetMainPlayer ();
 
-			if (!playerPosition.Equals (Vector3.negativeInfinity)) {
+			if (_player != null) {
 
-				spawnPosition.y = playerPosition.y;
+				spawnPosition.y = _player.GetPlayerPosition().y;
 
 			}
 
@@ -67,6 +69,8 @@ public class Map01SceneController : SceneController {
 		base.Awake ();
 
 		enableTriggers = true;
+
+		player = GameSceneController.GetMainPlayer ();
 
 		if (enterHouseDoor != null) {
 			enterHouseDoor.onTriggerEnterEvent += OnEnterHouseDoorTriggerEnter;
@@ -94,11 +98,11 @@ public class Map01SceneController : SceneController {
 	void OnEnterHouseDoorTriggerEnter (Collider2D col){
 		if (enableTriggers) {
 			Debug.Log ("OnEnterHouseDoorTriggerEnter: " + col.gameObject.name);
-			DemoController.SetPlayerVisible (false);
-			DemoController.SetPositionPlayer (Map02SceneController.playerSpawnPosition);
+			player.SetPlayerVisible (false);
+			player.SetPlayerPosition (Map02SceneController.playerSpawnPosition);
 			SceneService.LoadScene<Map01SceneController,Map02SceneController,TransitionSceneController> (false, delegate(Map02SceneController obj) {
 
-				DemoController.SetPlayerVisible (true);
+				player.SetPlayerVisible (true);
 				
 			});
 
@@ -122,10 +126,10 @@ public class Map01SceneController : SceneController {
 	void OnEnterExitLeftTriggerEnter (Collider2D col){
 		if (enableTriggers) {
 			Debug.Log ("OnEnterExitLeftTriggerEnter: " + col.gameObject.name);
-			DemoController.EnableInput (false);
-			DemoController.SetPositionPlayer (Map03SceneController.playerSpawnPosition);
+			player.EnableInput(false);
+			player.SetPlayerPosition (Map03SceneController.playerSpawnPosition);
 			SceneService.MoveToSceneFrom<Map01SceneController,Map03SceneController> (false, direction_to_move.left, delegate(Map03SceneController obj) {
-				DemoController.EnableInput(true);
+				player.EnableInput(true);
 			});
 			enableTriggers = false;
 		}
@@ -145,10 +149,10 @@ public class Map01SceneController : SceneController {
 	void OnEnterExitRightTriggerEnter (Collider2D col){
 		if (enableTriggers) {
 			Debug.Log ("OnEnterExitRightTriggerEnter: " + col.gameObject.name);
-			DemoController.EnableInput (false);
-			DemoController.SetPositionPlayer (Map04SceneController.playerSpawnPosition);
+			player.EnableInput(false);
+			player.SetPlayerPosition (Map04SceneController.playerSpawnPosition);
 			SceneService.MoveToSceneFrom<Map01SceneController,Map04SceneController> (false, direction_to_move.right, delegate(Map04SceneController obj) {
-				DemoController.EnableInput(true);
+				player.EnableInput(true);
 			});
 			enableTriggers = false;
 		}

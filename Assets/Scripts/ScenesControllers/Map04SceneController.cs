@@ -12,15 +12,17 @@ public class Map04SceneController : SceneController {
 
 	private bool enableTriggers = false;
 
+	private PlayerController player = null;
+
 	public static Vector3 playerSpawnPosition {
 		get {
 			Vector3 spawnPosition =  new Vector3 (342.0f, 119.0f, 0.0f);
 
-			Vector3 playerPosition = DemoController.GetPlayerPosition ();
+			PlayerController _player = GameSceneController.GetMainPlayer ();
 
-			if (!playerPosition.Equals (Vector3.negativeInfinity)) {
+			if (_player != null) {
 
-				spawnPosition.y = playerPosition.y;
+				spawnPosition.y = _player.GetPlayerPosition().y;
 
 			}
 
@@ -33,6 +35,9 @@ public class Map04SceneController : SceneController {
 	#region ===================================== MonoBehaviour ====================================
 	protected override void Awake() {
 		base.Awake ();
+
+		player = GameSceneController.GetMainPlayer ();
+
 		enableTriggers = true;
 		if (exitDoor != null) {
 			exitDoor.onTriggerEnterEvent += OnExitDoorTriggerEnter;
@@ -49,10 +54,10 @@ public class Map04SceneController : SceneController {
 
 		if (enableTriggers) {
 			Debug.Log ("OnExitDoorTriggerEnter: " + col.gameObject.name);
-			DemoController.EnableInput (false);
-			DemoController.SetPositionPlayer (Map01SceneController.playerSpawnPositionCommingFromRight);
+			player.EnableInput(false);
+			player.SetPlayerPosition (Map01SceneController.playerSpawnPositionCommingFromRight);
 			SceneService.MoveToSceneFrom<Map04SceneController,Map01SceneController> (false, direction_to_move.left,delegate(Map01SceneController obj) {
-				DemoController.EnableInput(true);
+				player.EnableInput(true);
 			});
 
 			enableTriggers = false;

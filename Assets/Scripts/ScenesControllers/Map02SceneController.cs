@@ -9,17 +9,20 @@ public class Map02SceneController :  SceneController {
 
 	public TriggerHelper exitDoor;
 
+	private PlayerController player = null;
+
 	public static Vector3 playerSpawnPosition {
 		get {
 			Vector3 spawnPosition =  new Vector3 (160.0f, 197.0f, 0.0f);
 
-			Vector3 playerPosition = DemoController.GetPlayerPosition ();
+			PlayerController _player = GameSceneController.GetMainPlayer ();
 
-			if (!playerPosition.Equals (Vector3.negativeInfinity)) {
+			if (_player != null) {
 
-				spawnPosition.x = playerPosition.x;
+				spawnPosition.x = _player.GetPlayerPosition().x;
 
 			}
+
 
 			return spawnPosition;
 		}
@@ -30,6 +33,8 @@ public class Map02SceneController :  SceneController {
 	#region ===================================== MonoBehaviour ====================================
 	protected override void Awake() {
 		base.Awake ();
+
+		player = GameSceneController.GetMainPlayer ();
 
 		if (exitDoor != null) {
 			exitDoor.onTriggerEnterEvent += OnExitDoorTriggerEnter;
@@ -46,10 +51,10 @@ public class Map02SceneController :  SceneController {
 	void OnExitDoorTriggerEnter (Collider2D col){
 		
 		Debug.Log( "OnExitDoorTriggerEnter: " + col.gameObject.name );
-		DemoController.SetPlayerVisible (false);
-		DemoController.SetPositionPlayer (Map01SceneController.playerSpawnPosition);
+		player.SetPlayerVisible (false);
+		player.SetPlayerPosition (Map01SceneController.playerSpawnPosition);
 		SceneService.LoadScene<Map02SceneController,Map01SceneController,TransitionSceneController>(false, delegate(Map01SceneController obj) {
-			DemoController.SetPlayerVisible (true);
+			player.SetPlayerVisible (true);
 		});
 	}
 
