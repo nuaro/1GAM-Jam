@@ -72,7 +72,7 @@
  </tile>
  <tile id="14" terrain="0,0,,">
   <objectgroup draworder="index">
-   <object id="1" x="-1" y="-0.333333" width="33.3333" height="6"/>
+   <object id="1" x="0" y="0" width="32" height="6"/>
   </objectgroup>
  </tile>
  <tile id="15" terrain=",0,,"/>
