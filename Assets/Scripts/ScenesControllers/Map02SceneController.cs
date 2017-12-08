@@ -55,6 +55,7 @@ public class Map02SceneController :  SceneController {
 		player.SetPlayerPosition (Map01SceneController.playerSpawnPosition);
 		SceneService.LoadScene<Map02SceneController,Map01SceneController,TransitionSceneController>(false, delegate(Map01SceneController obj) {
 			player.SetPlayerVisible (true);
+			player.SetFaceDirection(facing_direction.down);
 		});
 	}
 

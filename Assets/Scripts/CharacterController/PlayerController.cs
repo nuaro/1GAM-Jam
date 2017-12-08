@@ -28,6 +28,8 @@ public class PlayerController : MonoBehaviour {
 
 	private StateMachine<PlayerController> _playerStateMachine;
 
+	private facing_direction playerFacing = facing_direction.down;
+
 
 	#endregion
 
@@ -145,9 +147,53 @@ public class PlayerController : MonoBehaviour {
 		_animator.SetFloat ("speed_y", _velocity.y);
 
 		_controller.move (_velocity * Time.deltaTime);
+
+
+		UpdateFaceDirection ();
+
+	}
+
+	public void Attack (bool attack) {
+
+		_animator.SetBool ("attack", attack);
+
 	}
 
 
+	public facing_direction GetFacingDirection() {
+
+		return playerFacing;
+	}
+
+	public void SetFaceDirection(facing_direction direction) {
+
+		playerFacing = direction;
+
+	}
+
+
+	#endregion
+	#region private
+
+	private void UpdateFaceDirection( ) {
+
+		if (_velocity.x != 0 || _velocity.y != 0) {
+
+			if (_velocity.y != 0) {
+				var isGoingUp = _velocity.y > 0;
+
+				playerFacing = isGoingUp ? facing_direction.up : facing_direction.down;
+			}
+			if (_velocity.x != 0) {
+				var isGoingRight = _velocity.x > 0;
+
+				playerFacing = isGoingRight ? facing_direction.right : facing_direction.left;
+			}
+		}
+
+
+
+	}
 
 	#endregion
 }

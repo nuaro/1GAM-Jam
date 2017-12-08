@@ -72,6 +72,8 @@ public class Map01SceneController : SceneController {
 
 		player = GameSceneController.GetMainPlayer ();
 
+	
+
 		if (enterHouseDoor != null) {
 			enterHouseDoor.onTriggerEnterEvent += OnEnterHouseDoorTriggerEnter;
 			enterHouseDoor.onTriggerStayEvent += OnEnterHouseDoorTriggerStay;
@@ -103,6 +105,7 @@ public class Map01SceneController : SceneController {
 			SceneService.LoadScene<Map01SceneController,Map02SceneController,TransitionSceneController> (false, delegate(Map02SceneController obj) {
 
 				player.SetPlayerVisible (true);
+				player.SetFaceDirection(facing_direction.down);
 				
 			});
 

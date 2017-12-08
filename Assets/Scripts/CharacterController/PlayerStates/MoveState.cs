@@ -33,14 +33,16 @@ public class MoveState : State<PlayerController> {
 
 		player.Move ();
 
-//		if(Input.GetButtonDown("Attack") ){
-//
-//			//player.GetFSM ().ChangeState (MoveState.Instance);
-//
-//		}
-//
-//		if (Input.GetButtonDown ("Roll")) {
-//		}
+		if(Input.GetButtonDown("Attack") ){
+
+			player.GetFSM ().ChangeState (AttackState.Instance);
+
+		}
+
+		if (Input.GetButtonDown ("Roll")) {
+
+			Debug.LogError("-------------------------- direction facing " +player.GetFacingDirection ());
+		}
 
 	}
 
