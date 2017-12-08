@@ -12,7 +12,8 @@ public enum facing_direction {
 public class PlayerController : MonoBehaviour {
 
 	#region public
-	public float runSpeed = 8f;
+	public float runSpeed = 60f;
+	public float rollSpeed = 70f;
 	public GameObject SpriteAnimator;
 	#endregion
 
@@ -171,6 +172,31 @@ public class PlayerController : MonoBehaviour {
 
 	}
 
+	public void Roll(bool roll){
+
+		_animator.SetBool ("roll", roll);
+
+		facing_direction _direction = GetFacingDirection ();
+
+		switch (_direction) {
+		case facing_direction.down:
+			_velocity.y = -rollSpeed;
+			break;
+		case facing_direction.left:
+			_velocity.x = -rollSpeed;
+			break;
+		case facing_direction.right:
+			_velocity.x = rollSpeed;
+			break;
+		case facing_direction.up:
+			_velocity.y = rollSpeed;
+			break;
+		}
+
+		_controller.move (_velocity * Time.deltaTime);
+
+	}
+
 
 	#endregion
 	#region private
@@ -194,6 +220,8 @@ public class PlayerController : MonoBehaviour {
 
 
 	}
+
+
 
 	#endregion
 }

@@ -41,7 +41,8 @@ public class MoveState : State<PlayerController> {
 
 		if (Input.GetButtonDown ("Roll")) {
 
-			Debug.LogError("-------------------------- direction facing " +player.GetFacingDirection ());
+			player.GetFSM ().ChangeState (RollState.Instance);
+
 		}
 
 	}
